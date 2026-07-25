@@ -1,71 +1,96 @@
-const std = @import("std");
-const Io = std.Io;
+const rl = @import("raylib");
+const fb = @import("framebuffer.zig");
 
-const lab1 = @import("lab1");
+pub fn main() !void {
+    // -----------------------------------------
+    // Configuración
+    // -----------------------------------------
 
-pub fn main(init: std.process.Init) !void {
-    // Prints to stderr, unbuffered, ignoring potential errors.
-    std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
+    const screenWidth = 800;
+    const screenHeight = 600;
 
-    // This is appropriate for anything that lives as long as the process.
-    const arena: std.mem.Allocator = init.arena.allocator();
+    rl.initWindow(
+        screenWidth,
+        screenHeight,
+        "Laboratorio 1 - Poligonos",
+    );
+    defer rl.closeWindow();
 
-    // Accessing command line arguments:
-    const args = try init.minimal.args.toSlice(arena);
-    for (args) |arg| {
-        std.log.info("arg: {s}", .{arg});
-    }
+    rl.setTargetFPS(60);
 
-    // In order to do I/O operations need an `Io` instance.
-    const io = init.io;
+    var framebuffer =
+        fb.Framebuffer.init(
+            screenWidth,
+            screenHeight,
+            rl.Color.black,
+        );
+    defer framebuffer.deinit();
 
-    // Stdout is for the actual output of your application, for example if you
-    // are implementing gzip, then only the compressed bytes should be sent to
-    // stdout, not any debugging messages.
-    var stdout_buffer: [1024]u8 = undefined;
-    var stdout_file_writer: Io.File.Writer = .init(.stdout(), io, &stdout_buffer);
-    const stdout_writer = &stdout_file_writer.interface;
+    // -----------------------------------------
+    // Polígono
+    // -----------------------------------------
 
-    try lab1.printAnotherMessage(stdout_writer);
-
-    try stdout_writer.flush(); // Don't forget to flush!
-}
-
-test "simple test" {
-    const gpa = std.testing.allocator;
-    var list: std.ArrayList(i32) = .empty;
-    defer list.deinit(gpa); // Try commenting this out and see if zig detects the memory leak!
-    try list.append(gpa, 42);
-    try std.testing.expectEqual(@as(i32, 42), list.pop());
-}
-
-test "fuzz example" {
-    try std.testing.fuzz({}, testOne, .{});
-}
-
-fn testOne(context: void, smith: *std.testing.Smith) !void {
-    _ = context;
-    // Try passing `--fuzz` to `zig build test` and see if it manages to fail this test case!
-
-    const gpa = std.testing.allocator;
-    var list: std.ArrayList(u8) = .empty;
-    defer list.deinit(gpa);
-    while (!smith.eos()) switch (smith.value(enum { add_data, dup_data })) {
-        .add_data => {
-            const slice = try list.addManyAsSlice(gpa, smith.value(u4));
-            smith.bytes(slice);
-        },
-        .dup_data => {
-            if (list.items.len == 0) continue;
-            if (list.items.len > std.math.maxInt(u32)) return error.SkipZigTest;
-            const len = smith.valueRangeAtMost(u32, 1, @min(32, list.items.len));
-            const off = smith.valueRangeAtMost(u32, 0, @intCast(list.items.len - len));
-            try list.appendSlice(gpa, list.items[off..][0..len]);
-            try std.testing.expectEqualSlices(
-                u8,
-                list.items[off..][0..len],
-                list.items[list.items.len - len ..],
-            );
+    const polygon1 = fb.Polygon{
+        .vertices = &[_]fb.Vec2{
+            .{ .x = 413, .y = 177 },
+            .{ .x = 448, .y = 159 },
+            .{ .x = 502, .y = 88 },
+            .{ .x = 553, .y = 53 },
+            .{ .x = 535, .y = 36 },
+            .{ .x = 676, .y = 37 },
+            .{ .x = 660, .y = 52 },
+            .{ .x = 750, .y = 145 },
+            .{ .x = 761, .y = 179 },
+            .{ .x = 672, .y = 192 },
+            .{ .x = 659, .y = 214 },
+            .{ .x = 615, .y = 214 },
+            .{ .x = 632, .y = 230 },
+            .{ .x = 580, .y = 230 },
+            .{ .x = 597, .y = 215 },
+            .{ .x = 552, .y = 214 },
+            .{ .x = 517, .y = 144 },
+            .{ .x = 466, .y = 180 },
         },
     };
+
+    const polygon2 = fb.Polygon{
+        .vertices = &[_]fb.Vec2{
+            .{ .x = 682, .y = 175 },
+            .{ .x = 708, .y = 120 },
+            .{ .x = 735, .y = 148 },
+            .{ .x = 739, .y = 170 },
+        },
+    };
+
+    // -----------------------------------------
+    // Bucle principal
+    // -----------------------------------------
+
+    while (!rl.windowShouldClose()) {
+
+        // Limpiar framebuffer
+        framebuffer.clear();
+
+        // Dibujar polígono
+        framebuffer.drawPolygon(
+            polygon1,
+            rl.Color.blue,
+        );
+
+        framebuffer.drawPolygon(
+            polygon2,
+            rl.Color.red,
+        );
+
+        // Convertir Image -> Texture
+        try framebuffer.swap();
+
+        // Mostrar en pantalla
+        rl.beginDrawing();
+        defer rl.endDrawing();
+
+        rl.clearBackground(rl.Color.white);
+
+        framebuffer.render();
+    }
 }

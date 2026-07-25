@@ -3,7 +3,7 @@ build/
 
 # Caché de Zig
 .zig-cache/
-zig-out/
+zig-pkg
 
 # Binarios 
 *.exe
