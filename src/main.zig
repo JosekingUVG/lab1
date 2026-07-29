@@ -57,13 +57,13 @@ pub fn main() !void {
         // Dibujar polígono
         framebuffer.drawPolygon(
             polygon1,
-            rl.Color.blue,
+            rl.Color.white,
         );
 
         // Rellenar poligono
         framebuffer.fillPolygon(
             polygon1,
-            rl.Color.blue,
+            rl.Color.yellow,
         );
 
         // Convertir Image -> Texture
