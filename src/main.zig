@@ -32,33 +32,16 @@ pub fn main() !void {
 
     const polygon1 = fb.Polygon{
         .vertices = &[_]fb.Vec2{
-            .{ .x = 413, .y = 177 },
-            .{ .x = 448, .y = 159 },
-            .{ .x = 502, .y = 88 },
-            .{ .x = 553, .y = 53 },
-            .{ .x = 535, .y = 36 },
-            .{ .x = 676, .y = 37 },
-            .{ .x = 660, .y = 52 },
-            .{ .x = 750, .y = 145 },
-            .{ .x = 761, .y = 179 },
-            .{ .x = 672, .y = 192 },
-            .{ .x = 659, .y = 214 },
-            .{ .x = 615, .y = 214 },
-            .{ .x = 632, .y = 230 },
-            .{ .x = 580, .y = 230 },
-            .{ .x = 597, .y = 215 },
-            .{ .x = 552, .y = 214 },
-            .{ .x = 517, .y = 144 },
-            .{ .x = 466, .y = 180 },
-        },
-    };
-
-    const polygon2 = fb.Polygon{
-        .vertices = &[_]fb.Vec2{
-            .{ .x = 682, .y = 175 },
-            .{ .x = 708, .y = 120 },
-            .{ .x = 735, .y = 148 },
-            .{ .x = 739, .y = 170 },
+            .{ .x = 165, .y = 380 },
+            .{ .x = 185, .y = 360 },
+            .{ .x = 180, .y = 330 },
+            .{ .x = 207, .y = 345 },
+            .{ .x = 233, .y = 330 },
+            .{ .x = 230, .y = 360 },
+            .{ .x = 250, .y = 380 },
+            .{ .x = 220, .y = 385 },
+            .{ .x = 205, .y = 410 },
+            .{ .x = 193, .y = 383 },
         },
     };
 
@@ -77,9 +60,10 @@ pub fn main() !void {
             rl.Color.blue,
         );
 
-        framebuffer.drawPolygon(
-            polygon2,
-            rl.Color.red,
+        // Rellenar poligono
+        framebuffer.fillPolygon(
+            polygon1,
+            rl.Color.blue,
         );
 
         // Convertir Image -> Texture

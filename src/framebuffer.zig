@@ -159,4 +159,110 @@ pub const Framebuffer = struct {
             );
         }
     }
+
+    /// Pintar el poligono por pixeles (relleno)
+    pub fn fillPolygon(
+        self: *Framebuffer,
+        polygon: Polygon,
+        color: rl.Color,
+    ) void {
+        if (polygon.vertices.len < 3)
+            return;
+
+        // ---------------------------------------
+        // Encontrar el rango vertical
+        // ---------------------------------------
+
+        var minY = polygon.vertices[0].y;
+        var maxY = polygon.vertices[0].y;
+
+        for (polygon.vertices) |v| {
+            if (v.y < minY) minY = v.y;
+            if (v.y > maxY) maxY = v.y;
+        }
+
+        // Arreglo temporal para guardar las X
+        var intersections: [128]i32 = undefined;
+
+        var y = minY;
+
+        while (y <= maxY) : (y += 1) {
+            var count: usize = 0;
+
+            // -----------------------------------
+            // Buscar intersecciones
+            // -----------------------------------
+
+            for (polygon.vertices, 0..) |current, i| {
+                const next =
+                    polygon.vertices[(i + 1) % polygon.vertices.len];
+
+                const y1 = current.y;
+                const y2 = next.y;
+
+                // Regla para evitar contar dos veces
+                if (!((y >= @min(y1, y2)) and
+                    (y < @max(y1, y2))))
+                {
+                    continue;
+                }
+
+                // Ignorar líneas horizontales
+                if (y1 == y2)
+                    continue;
+
+                const t =
+                    @as(f32, @floatFromInt(y - y1)) /
+                    @as(f32, @floatFromInt(y2 - y1));
+
+                const x =
+                    @as(f32, @floatFromInt(current.x)) +
+                    t *
+                        @as(f32, @floatFromInt(next.x - current.x));
+
+                intersections[count] =
+                    @intFromFloat(@round(x));
+
+                count += 1;
+            }
+
+            // -----------------------------------
+            // Ordenar intersecciones
+            // -----------------------------------
+
+            var i: usize = 0;
+
+            while (i < count) : (i += 1) {
+                var j = i + 1;
+
+                while (j < count) : (j += 1) {
+                    if (intersections[j] < intersections[i]) {
+                        const tmp = intersections[i];
+                        intersections[i] = intersections[j];
+                        intersections[j] = tmp;
+                    }
+                }
+            }
+
+            // -----------------------------------
+            // Pintar entre pares
+            // -----------------------------------
+
+            var k: usize = 0;
+
+            while (k + 1 < count) : (k += 2) {
+                var x = intersections[k];
+
+                while (x <= intersections[k + 1]) : (x += 1) {
+                    self.drawPixel(
+                        .{
+                            .x = x,
+                            .y = y,
+                        },
+                        color,
+                    );
+                }
+            }
+        }
+    }
 };
