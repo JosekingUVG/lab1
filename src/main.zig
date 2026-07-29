@@ -32,16 +32,10 @@ pub fn main() !void {
 
     const polygon1 = fb.Polygon{
         .vertices = &[_]fb.Vec2{
-            .{ .x = 165, .y = 380 },
-            .{ .x = 185, .y = 360 },
-            .{ .x = 180, .y = 330 },
-            .{ .x = 207, .y = 345 },
-            .{ .x = 233, .y = 330 },
-            .{ .x = 230, .y = 360 },
-            .{ .x = 250, .y = 380 },
-            .{ .x = 220, .y = 385 },
-            .{ .x = 205, .y = 410 },
-            .{ .x = 193, .y = 383 },
+            .{ .x = 321, .y = 335 },
+            .{ .x = 288, .y = 286 },
+            .{ .x = 339, .y = 251 },
+            .{ .x = 374, .y = 302 },
         },
     };
 
@@ -57,13 +51,13 @@ pub fn main() !void {
         // Dibujar polígono
         framebuffer.drawPolygon(
             polygon1,
-            rl.Color.blue,
+            rl.Color.red,
         );
 
         // Rellenar poligono
         framebuffer.fillPolygon(
             polygon1,
-            rl.Color.blue,
+            rl.Color.red,
         );
 
         // Convertir Image -> Texture
